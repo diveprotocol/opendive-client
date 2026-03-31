@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0+draft.00] - 2026-03-31
+
+### Added
+
+- Updated package metadata in `pyproject.toml` to ensure correct deployment.
+- Additional package information added for clarity and completeness.
+
+### Changed
+
+- N/A (initial draft for deployment adjustments).
+
+### Fixed
+
+- N/A
+
+### Security
+
+- N/A
+
+### Known Issues
+
+- N/A
+
+---
+
 ## [0.1.0-alpha.2+draft.00] - 2026-03-31
 
 ### Added

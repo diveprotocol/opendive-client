@@ -4,19 +4,40 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "opendive-client"
-version = "0.1.0a2"
+version = "0.1.0"
 authors = [
-  { name="Matéo Florian Callec", email="mateo@callec.net" },
+  { name = "Matéo Florian Callec" },
+  { email = "mateo@callec.net" }
 ]
 description = "Python library and CLI for Domain-based Integrity Verification Enforcement (DIVE)"
 readme = "README.md"
 requires-python = ">=3.9"
+license = { text = "MIT" }
 dependencies = [
     "httpx",
     "click",
     "cryptography",
     "dnspython"
 ]
+keywords = ["security", "dns", "integrity", "dive", "cli"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Security",
+]
+
+[project.urls]
+Homepage = "https://diveprotocol.org"
+Issues = "https://github.com/diveprotocol/opendive-client/issues"
+Repository = "https://github.com/diveprotocol/opendive-client.git"
+
+[project.scripts]
+opendive = "opendive.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff]
 line-length = 88

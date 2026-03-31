@@ -22,7 +22,7 @@ This roadmap outlines the future development plans for the DIVE (Domain-based In
 
 ## Current Status
 
-**Version**: 0.1.0-alpha
+**Version**: 0.1.0
 **Features Implemented**:
 
 - Core DIVE protocol implementation (DNS records, HTTP headers)
@@ -43,7 +43,7 @@ This roadmap outlines the future development plans for the DIVE (Domain-based In
 
 ### 1. RFC Compliance Verification (Priority)
 
-- **Task**: Comprehensive audit of current implementation against [draft-callec-dive-01](https://datatracker.ietf.org/doc/draft-callec-dive/)
+- **Task**: Comprehensive audit of current implementation against [draft-callec-dive-00](https://datatracker.ietf.org/doc/draft-callec-dive/)
 - **Deliverables**:
   - Compliance report documenting gaps
   - Test suite covering all RFC requirements
@@ -217,7 +217,7 @@ This roadmap outlines the future development plans for the DIVE (Domain-based In
 | RFC 4033             | DNSSEC            | ✅ Fully implemented      |
 | RFC 8032             | Ed25519/Ed448     | ✅ Fully implemented      |
 | RFC 8941             | Structured Fields | ✅ Fully implemented      |
-| draft-callec-dive-01 | Core Protocol     | ⚠️ Partial implementation |
+| draft-callec-dive-00 | Core Protocol     | ⚠️ Partial implementation |
 
 ---
 

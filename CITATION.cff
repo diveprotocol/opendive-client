@@ -6,7 +6,7 @@ authors:
     email: "mateo@callec.net"
     orcid: "https://orcid.org/0009-0000-8025-5350"
 title: "OpenDIVE: Python Client for Domain-based Integrity Verification Enforcement (DIVE)"
-version: 0.1.0a2
+version: 0.1.0
 date-released: 2026-03-31
 url: "https://github.com/diveprotocol/opendive-client"
 repository-code: "https://github.com/diveprotocol/opendive-client"

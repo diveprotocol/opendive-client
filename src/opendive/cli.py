@@ -585,7 +585,7 @@ def cmd_dns(
 def cmd_version() -> None:
     """Display version and project information."""
     _header("DIVE — Version and Project Information")
-    _info(f"Version:        0.1.0a2 (0.1.0-alpha.2+draft.00)")
+    _info(f"Version:        0.1.0 (0.1.0+draft.00)")
     _info(f"License:        MIT")
     _info(f"Project repo:   https://github.com/diveprotocol/opendive-client")
     _info(f"Project site:   https://diveprotocol.org")
