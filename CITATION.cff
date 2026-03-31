@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Callec"
+    given-names: "Matéo Florian"
+    email: "mateo@callec.net"
+    orcid: "https://orcid.org/0009-0000-8025-5350"
+title: "OpenDIVE: Python Client for Domain-based Integrity Verification Enforcement (DIVE)"
+version: 0.1.0a2
+date-released: 2026-03-31
+url: "https://github.com/diveprotocol/opendive-client"
+repository-code: "https://github.com/diveprotocol/opendive-client"
+license: MIT
+keywords:
+  - dnssec
+  - cryptography
+  - integrity
+  - python
+  - protocols
+abstract: >-
+  OpenDIVE is a Python client library for the DIVE protocol, 
+  a cryptographic protocol that leverages DNSSEC to verify 
+  the integrity and authenticity of web resources.

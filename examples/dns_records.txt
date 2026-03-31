@@ -1,0 +1,2 @@
+_dive.example.com.              1800    IN  TXT "v=\"dive-draft-00\", scopes=(\"strict\"), directives=(\"https-required\"), cache=1800, report-to=\"https://reports.example.com/dive\""
+mykey._divekey.example.com.     1800    IN  TXT "sig=\"ed25519\", key=:BASE64RAWKEY:, allowed-hash=(\"sha256\" \"sha384\"), cache=900"

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opendive-client"
+version = "0.1.0a2"
+authors = [
+  { name="Matéo Florian Callec", email="mateo@callec.net" },
+]
+description = "Python library and CLI for Domain-based Integrity Verification Enforcement (DIVE)"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "httpx",
+    "click",
+    "cryptography",
+    "dnspython"
+]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"

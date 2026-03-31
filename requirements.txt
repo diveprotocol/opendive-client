@@ -1,0 +1,4 @@
+httpx
+cryptography
+click
+dnspython
