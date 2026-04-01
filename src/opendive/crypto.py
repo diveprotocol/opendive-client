@@ -180,11 +180,12 @@ def sign_hash(
 
     Typical DIVE usage: sign_hash(file_bytes, private_key)
     """
-    digest = hash_payload(data, hash_algorithm)
-    signature = sign(digest.encode("utf-8"), private_key_b64, sig_algorithm)
+    payload = build_signature_input(data, hash_algorithm)
+    signature = sign(payload, private_key_b64, sig_algorithm)
+
     return {
         "hash_algorithm": hash_algorithm,
-        "digest": digest,
+        "digest": compute_hex_digest(data, hash_algorithm),
         "sig_algorithm": sig_algorithm,
         "signature": signature,
     }
