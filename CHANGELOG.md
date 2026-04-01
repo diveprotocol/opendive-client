@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+Here is the rewritten version in English for **0.1.1-beta.1+draft.00**:
+
+---
+
+## [0.1.1-beta.1+draft.00] - 2026-04-01
+
+### Added
+
+- URL support in the `dive dns` command:
+
+  - The command now accepts full URLs in addition to domain names.
+  - Automatically extracts the domain for DNS resolution.
+
+### Changed
+
+- N/A
+
+### Fixed
+
+- N/A
+
+### Security
+
+- N/A
+
+### Known Issues
+
+- N/A
+
+---
+
 ## [0.1.1-alpha.1+draft.00] - 2026-04-01
 
 ### Added

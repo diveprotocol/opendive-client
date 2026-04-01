@@ -17,7 +17,8 @@ Only the latest alpha release (`0.1.0+draft.00`) is currently supported. Securit
 
 | Version                | Supported          |
 | ---------------------- | ------------------ |
-| 0.1.1-alpha.1+draft.00 | :white_check_mark: |
+| 0.1.1-beta.1+draft.00  | :white_check_mark: |
+| 0.1.1-alpha.1+draft.00 | :x:                |
 | 0.1.0+draft.00         | :white_check_mark: |
 | 0.1.0-alpha.2+draft.00 | :x:                |
 | 0.1.0-alpha.1+draft.00 | :x:                |
