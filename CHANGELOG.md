@@ -7,6 +7,113 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2026-04-01
+
+### Added
+
+- **SHA3 Support**: Added implementations for SHA3-256, SHA3-384, and SHA3-512 hash algorithms.
+
+### Changed
+
+- Removal of beta version tags and draft metadata for the production version.
+
+### Fixed
+
+- **Hash Verification**: Corrected the implementation of hash verification, which was previously flawed.
+
+### Security
+
+- N/A
+
+### Known Issues
+
+- N/A
+
+---
+
+## [0.1.1-beta.2+draft.00] - 2026-04-01
+
+### Added
+
+- **SHA3 Support**: Added implementations for SHA3-256, SHA3-384, and SHA3-512 hash algorithms.
+
+### Changed
+
+- N/A
+
+### Fixed
+
+- **Hash Verification**: Corrected the implementation of hash verification, which was previously flawed.
+
+### Security
+
+- N/A
+
+### Known Issues
+
+- N/A
+
+---
+
+## [0.1.1-beta.1+draft.00] - 2026-04-01
+
+### Added
+
+- URL support in the `dive dns` command:
+
+  - The command now accepts full URLs in addition to domain names.
+  - Automatically extracts the domain for DNS resolution.
+
+### Changed
+
+- N/A
+
+### Fixed
+
+- N/A
+
+### Security
+
+- N/A
+
+### Known Issues
+
+- N/A
+
+---
+
+## [0.1.1-alpha.1+draft.00] - 2026-04-01
+
+### Added
+
+- Clarified signature pipeline behavior in documentation.
+- Improved internal consistency between hashing and signing steps.
+
+### Changed
+
+- Refactored `sign_hash` implementation:
+
+  - The signature is now generated from the canonical payload returned by `build_signature_input(...)` instead of the UTF-8 encoded digest string.
+  - Aligns signing logic with protocol expectations and verification flow.
+
+### Fixed
+
+- Fixed critical signature mismatch issue:
+
+  - Previously, the digest (`hex string`) was encoded and signed directly.
+  - This caused incompatibility with verification logic expecting a structured payload.
+  - The new implementation ensures both signer and verifier operate on the same canonical input.
+
+### Security
+
+- Eliminates ambiguity in signed data representation, reducing risk of signature misuse or verification inconsistencies.
+
+### Known Issues
+
+- Existing signatures generated with previous versions are not compatible with this version.
+
+---
+
 ## [0.1.0+draft.00] - 2026-03-31
 
 ### Added

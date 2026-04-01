@@ -4,7 +4,8 @@ Handles hashing, signing, and signature verification.
 
 Supported algorithms (per DIVE RFC):
   Signatures : ed25519 (recommended), ed448
-  Hashes     : sha256 (recommended), sha384, sha512
+  Hashes     : sha256 (recommended), sha384, sha512,
+               sha3-256, sha3-384, sha3-512
 """
 
 from __future__ import annotations
@@ -26,13 +27,22 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 # ── Types ─────────────────────────────────────────────────────────────────────
 
 SigAlgorithm = Literal["ed25519", "ed448"]
-HashAlgorithm = Literal["sha256", "sha384", "sha512"]
+HashAlgorithm = Literal[
+    "sha256", "sha384", "sha512", "sha3-256", "sha3-384", "sha3-512"
+]
 
 DEFAULT_SIG_ALG: SigAlgorithm = "ed25519"
 DEFAULT_HASH_ALG: HashAlgorithm = "sha256"
 
 SUPPORTED_SIG_ALGS: set[str] = {"ed25519", "ed448"}
-SUPPORTED_HASH_ALGS: set[str] = {"sha256", "sha384", "sha512"}
+SUPPORTED_HASH_ALGS: set[str] = {
+    "sha256",
+    "sha384",
+    "sha512",
+    "sha3-256",
+    "sha3-384",
+    "sha3-512",
+}
 
 # ── Exceptions ────────────────────────────────────────────────────────────────
 
@@ -72,6 +82,17 @@ def _load_public_key(
     raise UnsupportedAlgorithm(f"Unknown signature algorithm: {algorithm!r}")
 
 
+# ── Internal ──────────────────────────────────────────────────────────────────
+
+
+def _hashlib_name(algorithm: str) -> str:
+    """
+    Translate a DIVE algorithm name to its hashlib equivalent.
+    DIVE uses "sha3-256" while hashlib expects "sha3_256".
+    """
+    return algorithm.replace("-", "_")
+
+
 # ── Hash ──────────────────────────────────────────────────────────────────────
 
 
@@ -83,7 +104,7 @@ def hash_payload(
     Hash arbitrary bytes using the specified algorithm.
     Returns a lowercase hex digest.
 
-    Supported: sha256 (default), sha384, sha512
+    Supported: sha256 (default), sha384, sha512, sha3-256, sha3-384, sha3-512
     """
     if algorithm not in SUPPORTED_HASH_ALGS:
         raise UnsupportedAlgorithm(
@@ -91,7 +112,7 @@ def hash_payload(
             f"Supported: {sorted(SUPPORTED_HASH_ALGS)}",
         )
 
-    h = hashlib.new(algorithm, data)
+    h = hashlib.new(_hashlib_name(algorithm), data)
     return h.hexdigest()
 
 
@@ -104,6 +125,8 @@ def hash_file(
     Hash a file on disk using the specified algorithm.
     Reads in chunks to support large files.
     Returns a lowercase hex digest.
+
+    Supported: sha256 (default), sha384, sha512, sha3-256, sha3-384, sha3-512
     """
     if algorithm not in SUPPORTED_HASH_ALGS:
         raise UnsupportedAlgorithm(
@@ -111,7 +134,7 @@ def hash_file(
             f"Supported: {sorted(SUPPORTED_HASH_ALGS)}",
         )
 
-    h = hashlib.new(algorithm)
+    h = hashlib.new(_hashlib_name(algorithm))
     with open(path, "rb") as f:
         while chunk := f.read(chunk_size):
             h.update(chunk)
@@ -155,7 +178,6 @@ def sign_file(
     2. Signs the hex digest (DIVE RFC requirement).
     3. Returns a dict containing all metadata for the CLI output.
     """
-    # Reuse your existing sign_hash logic
     result = sign_hash(
         data,
         private_key_b64,
@@ -180,11 +202,12 @@ def sign_hash(
 
     Typical DIVE usage: sign_hash(file_bytes, private_key)
     """
-    digest = hash_payload(data, hash_algorithm)
-    signature = sign(digest.encode("utf-8"), private_key_b64, sig_algorithm)
+    payload = build_signature_input(data, hash_algorithm)
+    signature = sign(payload, private_key_b64, sig_algorithm)
+
     return {
         "hash_algorithm": hash_algorithm,
-        "digest": digest,
+        "digest": compute_hex_digest(data, hash_algorithm),
         "sig_algorithm": sig_algorithm,
         "signature": signature,
     }
@@ -232,16 +255,19 @@ def verify_hash(
     Hash the payload then verify the signature over the hex digest.
     Mirror of sign_hash().
     """
-    digest = hash_payload(data, hash_algorithm)
-    return verify(digest.encode("utf-8"), signature_b64, public_key_b64, sig_algorithm)
+    payload = build_signature_input(data, hash_algorithm)
+    return verify(payload, signature_b64, public_key_b64, sig_algorithm)
 
 
 def build_signature_input(data: bytes, algorithm: str) -> bytes:
     """
-    Implémentation stricte du RFC DIVE v0.1 §5.5.1
+    Strict implementation of DIVE RFC v0.1 §5.5.1.
     input = hash_algorithm_name || ":" || hash_bytes_raw
+
+    Note: the algorithm name in the prefix uses the DIVE canonical form
+    (e.g. "sha3-256"), not the hashlib internal name ("sha3_256").
     """
-    hasher = hashlib.new(algorithm)
+    hasher = hashlib.new(_hashlib_name(algorithm))
     hasher.update(data)
     hash_bytes_raw = hasher.digest()
 

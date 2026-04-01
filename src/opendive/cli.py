@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import sys
+from urllib.parse import urlparse
 
 import click
 
@@ -252,7 +253,10 @@ def cmd_keygen(alg: str, key_id: str, domain: str, output_json: bool) -> None:
     "--hash",
     "hash_alg",
     default="sha256",
-    type=click.Choice(["sha256", "sha384", "sha512"], case_sensitive=False),
+    type=click.Choice(
+        ["sha256", "sha384", "sha512", "sha3-256", "sha3-384", "sha3-512"],
+        case_sensitive=False,
+    ),
     show_default=True,
     help="Hash algorithm.",
 )
@@ -478,7 +482,7 @@ def cmd_download(
 
 
 @cli.command("dns")
-@click.argument("fqdn")
+@click.argument("fqdn_or_url")
 @click.option(
     "--dns",
     "custom_dns",
@@ -500,14 +504,16 @@ def cmd_download(
     help="Output as JSON.",
 )
 def cmd_dns(
-    fqdn: str, custom_dns: str | None, key_id: str | None, output_json: bool
+    fqdn_or_url: str, custom_dns: str | None, key_id: str | None, output_json: bool
 ) -> None:
     """
-    Inspect _dive and (optionally) _divekey DNS records for FQDN.
-
-    Walks up the domain tree to find the applicable policy record,
-    mirroring the client's Step 1 behaviour.
+    Inspect _dive and (optionally) _divekey DNS records for FQDN or URL.
     """
+    # Extract domain from URL if needed
+    parsed = urlparse(fqdn_or_url)
+    fqdn = parsed.netloc if parsed.netloc else fqdn_or_url
+
+    # Rest of the function remains the same
     output: dict = {"fqdn": fqdn, "policy": None, "key": None}
 
     # Policy record
@@ -532,7 +538,7 @@ def cmd_dns(
             output["key"] = {"_error": str(exc)}
 
     if output_json:
-        # Remove non-serialisable internal keys for clean output
+
         def _clean(d):
             if isinstance(d, dict):
                 return {k: _clean(v) for k, v in d.items()}
@@ -570,7 +576,7 @@ def cmd_dns(
                 _ok(f"Key record found at {key.get('_fqdn')}")
                 _info(f"  Key ID       : {key.get('_key_id')}")
                 _info(f"  Algorithm    : {key.get('sig')}")
-                _info(f"  Public key   : {key.get('key', '')[:20]}…")
+                _info(f"  Public key   : {key.get('key', '')}")
                 _info(f"  Allowed hash : {key.get('allowed-hash', 'any')}")
                 _info(f"  Cache TTL    : {key.get('cache', 0)}s")
                 _info(f"  DNSSEC       : {key.get('_dnssec_validated', False)}")
@@ -585,7 +591,7 @@ def cmd_dns(
 def cmd_version() -> None:
     """Display version and project information."""
     _header("DIVE — Version and Project Information")
-    _info(f"Version:        0.1.0 (0.1.0+draft.00)")
+    _info(f"Version:        0.1.1 (0.1.1+draft.00)")
     _info(f"License:        MIT")
     _info(f"Project repo:   https://github.com/diveprotocol/opendive-client")
     _info(f"Project site:   https://diveprotocol.org")
