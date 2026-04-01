@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1-alpha.1+draft.00] - 2026-04-01
+
+### Added
+
+- Clarified signature pipeline behavior in documentation.
+- Improved internal consistency between hashing and signing steps.
+
+### Changed
+
+- Refactored `sign_hash` implementation:
+
+  - The signature is now generated from the canonical payload returned by `build_signature_input(...)` instead of the UTF-8 encoded digest string.
+  - Aligns signing logic with protocol expectations and verification flow.
+
+### Fixed
+
+- Fixed critical signature mismatch issue:
+
+  - Previously, the digest (`hex string`) was encoded and signed directly.
+  - This caused incompatibility with verification logic expecting a structured payload.
+  - The new implementation ensures both signer and verifier operate on the same canonical input.
+
+### Security
+
+- Eliminates ambiguity in signed data representation, reducing risk of signature misuse or verification inconsistencies.
+
+### Known Issues
+
+- Existing signatures generated with previous versions are not compatible with this version.
+
+---
+
 ## [0.1.0+draft.00] - 2026-03-31
 
 ### Added

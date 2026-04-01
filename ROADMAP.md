@@ -22,7 +22,7 @@ This roadmap outlines the future development plans for the DIVE (Domain-based In
 
 ## Current Status
 
-**Version**: 0.1.0
+**Version**: 0.1.1a1
 **Features Implemented**:
 
 - Core DIVE protocol implementation (DNS records, HTTP headers)

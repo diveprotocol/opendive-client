@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python: 3.8+](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
-[![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-orange.svg)](https://github.com/diveprotocol/opendive-client/releases)
+[![Version: 0.1.1a1](https://img.shields.io/badge/Version-0.1.1a1-orange.svg)](https://github.com/diveprotocol/opendive-client/releases)
 [![Status: Alpha](https://img.shields.io/badge/Status-Alpha-red.svg)](https://github.com/diveprotocol/opendive-client)
 
 **OpenDIVE** is a Python client library for the **DIVE protocol** (Domain-based Integrity Verification Enforcement), a cryptographic protocol that leverages **DNSSEC** to verify the integrity and authenticity of web resources. DIVE operates as an additional security layer above HTTP/HTTPS, ensuring that resources are signed and validated against DNS-published keys.
