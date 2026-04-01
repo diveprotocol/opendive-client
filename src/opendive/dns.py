@@ -32,7 +32,7 @@ DIVE_KEY_PREFIX = "_divekey"
 
 # Supported algorithms
 ALLOWED_ALGORITHMS = {"ed25519", "ed448"}
-ALLOWED_HASH = {"sha256", "sha384", "sha512"}
+ALLOWED_HASH = {"sha256", "sha384", "sha512", "sha3-256", "sha3-384", "sha3-512"}
 
 # Required fields for records
 DIVE_REQUIRED_FIELDS = {"v", "scopes"}

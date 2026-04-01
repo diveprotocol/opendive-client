@@ -253,7 +253,10 @@ def cmd_keygen(alg: str, key_id: str, domain: str, output_json: bool) -> None:
     "--hash",
     "hash_alg",
     default="sha256",
-    type=click.Choice(["sha256", "sha384", "sha512"], case_sensitive=False),
+    type=click.Choice(
+        ["sha256", "sha384", "sha512", "sha3-256", "sha3-384", "sha3-512"],
+        case_sensitive=False,
+    ),
     show_default=True,
     help="Hash algorithm.",
 )
@@ -535,6 +538,7 @@ def cmd_dns(
             output["key"] = {"_error": str(exc)}
 
     if output_json:
+
         def _clean(d):
             if isinstance(d, dict):
                 return {k: _clean(v) for k, v in d.items()}
@@ -587,7 +591,7 @@ def cmd_dns(
 def cmd_version() -> None:
     """Display version and project information."""
     _header("DIVE — Version and Project Information")
-    _info(f"Version:        0.1.1b1 (0.1.1-beta.1+draft.00)")
+    _info(f"Version:        0.1.1b2 (0.1.1-beta.2+draft.00)")
     _info(f"License:        MIT")
     _info(f"Project repo:   https://github.com/diveprotocol/opendive-client")
     _info(f"Project site:   https://diveprotocol.org")

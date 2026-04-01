@@ -43,7 +43,7 @@ from .dns import (
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 
-ALLOWED_HASH_ALGS = {"sha256", "sha384", "sha512"}
+ALLOWED_HASH_ALGS = {"sha256", "sha384", "sha512", "sha3-256", "sha3-384", "sha3-512"}
 REPORT_VERSION = "0.1"
 
 # Failure reason strings (RFC §6)

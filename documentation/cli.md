@@ -127,13 +127,13 @@ opendive sign <file> [OPTIONS]
 
 ### Options
 
-| Option              | Description                                       | Default   |
-| ------------------- | ------------------------------------------------- | --------- |
-| `--private-key B64` | Base64-encoded private key (from `dive keygen`).  | Required  |
-| `--key-id ID`       | Key ID to embed in the `DIVE-Sig` header.         | Required  |
-| `--alg ALG`         | Signature algorithm (`ed25519` or `ed448`).       | `ed25519` |
-| `--hash ALG`        | Hash algorithm (`sha256`, `sha384`, or `sha512`). | `sha256`  |
-| `--json`            | Output as JSON.                                   | False     |
+| Option              | Description                                                                           | Default   |
+| ------------------- | ------------------------------------------------------------------------------------- | --------- |
+| `--private-key B64` | Base64-encoded private key (from `dive keygen`).                                      | Required  |
+| `--key-id ID`       | Key ID to embed in the `DIVE-Sig` header.                                             | Required  |
+| `--alg ALG`         | Signature algorithm (`ed25519` or `ed448`).                                           | `ed25519` |
+| `--hash ALG`        | Hash algorithm (`sha256`, `sha384`, `sha512`, `sha3-256`, `sha3-384`, or `sha3-512`). | `sha256`  |
+| `--json`            | Output as JSON.                                                                       | False     |
 
 ### Output
 
