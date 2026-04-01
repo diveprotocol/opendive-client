@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2026-04-01
+
+### Added
+
+- **SHA3 Support**: Added implementations for SHA3-256, SHA3-384, and SHA3-512 hash algorithms.
+
+### Changed
+
+- Removal of beta version tags and draft metadata for the production version.
+
+### Fixed
+
+- **Hash Verification**: Corrected the implementation of hash verification, which was previously flawed.
+
+### Security
+
+- N/A
+
+### Known Issues
+
+- N/A
+
+---
+
 ## [0.1.1-beta.2+draft.00] - 2026-04-01
 
 ### Added
