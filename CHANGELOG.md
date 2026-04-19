@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0-alpha.1+draft.01] — 2026-04-19
+
+### Changed
+
+- **Protocol version**: DNS `_dive` policy records now require `v="dive-draft-01"` (previously `dive-draft-00`).
+- **Signature headers**: Replaced the custom `DIVE-Sig` header with RFC 9421 HTTP Message Signatures.
+  - Servers must now send three standard headers: `Content-Digest` (RFC 9530), `Signature-Input`, and `Signature`.
+  - `Content-Digest` carries the base64-encoded body hash (e.g. `sha-256=:BASE64:`).
+  - `Signature-Input` declares the signature label, covered components (`"content-digest"`), `keyid`, and `alg`.
+  - `Signature` carries the base64-encoded signature value per RFC 9421.
+- **Signature input construction**: Signatures are now computed over the RFC 9421 signature base (derived from `Signature-Input` covered components), replacing the custom `algorithm:raw_hash_bytes` input.
+- **Multiple signatures**: Expressed as multiple labeled entries in the same `Signature-Input` / `Signature` headers (RFC 9421 §4.2) rather than comma-separated `DIVE-Sig` entries.
+- **Failure reports**: `headers-received.dive-sig` replaced by `headers-received.signature-input` and `headers-received.content-digest`.
+- **`dive sign` CLI**: Now outputs `Content-Digest`, `Signature-Input`, and `Signature` headers instead of a single `DIVE-Sig` header.
+- **`sign_file()` API**: Now requires a `key_id` argument; returns `content_digest_header`, `signature_input_header`, and `signature_header` fields.
+- **`sign_hash()` / `verify_hash()` API**: Added optional `key_id` parameter (default `"key1"`); both now operate over the RFC 9421 signature base.
+
+---
+
 ## [0.1.1] - 2026-04-01
 
 ### Added

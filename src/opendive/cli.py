@@ -5,7 +5,7 @@ Commands:
   dive verify   <url>   Full client verification of a resource
   dive download <url>   Download a resource to disk (only if DIVE passes)
   dive keygen           Generate an Ed25519/Ed448 key pair
-  dive sign     <file>  Sign a file and print the DIVE-Sig header entry
+  dive sign     <file>  Sign a file and print RFC 9421 HTTP signature headers
   dive dns      <fqdn>  Inspect _dive and _divekey DNS records
 """
 
@@ -113,7 +113,8 @@ def cmd_verify(
             "hash_algorithm": result.hash_algorithm,
             "hex_digest": result.hex_digest,
             "signature_valid": result.signature_valid,
-            "dive_sig_header": result.dive_sig_header,
+            "signature_input_header": result.signature_input_header,
+            "content_digest_header": result.content_digest_header,
             "key_resolution": [
                 {
                     "key_id": e.key_id,
@@ -143,8 +144,10 @@ def cmd_verify(
     else:
         _info("Not in any DIVE scope — accepted without verification")
 
-    if result.dive_sig_header:
-        _info(f"DIVE-Sig       : {result.dive_sig_header}")
+    if result.signature_input_header:
+        _info(f"Signature-Input: {result.signature_input_header}")
+    if result.content_digest_header:
+        _info(f"Content-Digest : {result.content_digest_header}")
 
     if result.hash_algorithm and result.hex_digest:
         _info(f"Hash ({result.hash_algorithm}): {result.hex_digest}")
@@ -240,7 +243,7 @@ def cmd_keygen(alg: str, key_id: str, domain: str, output_json: bool) -> None:
     "--key-id",
     required=True,
     metavar="ID",
-    help="Key ID to embed in the DIVE-Sig header.",
+    help="Key ID to embed in the Signature-Input header.",
 )
 @click.option(
     "--alg",
@@ -276,9 +279,10 @@ def cmd_sign(
     output_json: bool,
 ) -> None:
     """
-    Sign FILE and print the DIVE-Sig header value.
+    Sign FILE and print the RFC 9421 HTTP signature headers.
 
-    The output can be added directly as an HTTP response header on your server.
+    The three output headers (Content-Digest, Signature-Input, Signature)
+    can be added directly to HTTP responses on your server.
     """
     with open(file, "rb") as fh:
         data = fh.read()
@@ -287,6 +291,7 @@ def cmd_sign(
         result = sign_file(
             data,
             private_key,
+            key_id,
             sig_algorithm=alg,  # type: ignore[arg-type]
             hash_algorithm=hash_alg,  # type: ignore[arg-type]
         )
@@ -297,8 +302,6 @@ def cmd_sign(
         click.secho(f"Error signing file: {exc}", fg="red", err=True)
         sys.exit(1)
 
-    dive_sig_entry = f"{key_id}:{result['hash_algorithm']}:{result['signature']}"
-
     if output_json:
         click.echo(
             json.dumps(
@@ -308,7 +311,9 @@ def cmd_sign(
                     "sig_algorithm": result["sig_algorithm"],
                     "hex_digest": result["hex_digest"],
                     "signature": result["signature"],
-                    "dive_sig_entry": dive_sig_entry,
+                    "content_digest_header": result["content_digest_header"],
+                    "signature_input_header": result["signature_input_header"],
+                    "signature_header": result["signature_header"],
                 },
                 indent=2,
             )
@@ -320,11 +325,10 @@ def cmd_sign(
     _info(f"Sig  algorithm : {result['sig_algorithm']}")
     _info(f"Hex digest     : {result['hex_digest']}")
     click.echo()
-    click.secho("  DIVE-Sig header entry:", bold=True)
-    click.echo(f"  {dive_sig_entry}")
-    click.echo()
-    click.secho("  Full HTTP response header:", bold=True)
-    click.echo(f"  DIVE-Sig: {dive_sig_entry}")
+    click.secho("  HTTP response headers:", bold=True)
+    click.echo(f"  Content-Digest: {result['content_digest_header']}")
+    click.echo(f"  Signature-Input: {result['signature_input_header']}")
+    click.echo(f"  Signature: {result['signature_header']}")
 
 
 # ── dive download ─────────────────────────────────────────────────────────────
@@ -591,7 +595,7 @@ def cmd_dns(
 def cmd_version() -> None:
     """Display version and project information."""
     _header("DIVE — Version and Project Information")
-    _info(f"Version:        0.1.1 (0.1.1+draft.00)")
+    _info(f"Version:        0.2.0a1 (0.2.0-alpha.1+draft.01)")
     _info(f"License:        MIT")
     _info(f"Project repo:   https://github.com/diveprotocol/opendive-client")
     _info(f"Project site:   https://diveprotocol.org")

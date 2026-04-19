@@ -192,7 +192,7 @@ def _parse_dive_record(raw: str) -> dict[str, Any]:
         if field not in params:
             raise DiveRecordInvalid(f"Missing required field: {field!r}")
 
-    if params.get("v") != "dive-draft-00":
+    if params.get("v") != "dive-draft-01":
         raise DiveRecordInvalid(f"Unsupported version: {params.get('v')!r}")
 
     return params
