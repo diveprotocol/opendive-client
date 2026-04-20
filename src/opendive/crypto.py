@@ -64,9 +64,9 @@ def _load_private_key(
 ) -> Ed25519PrivateKey | Ed448PrivateKey:
     raw = base64.b64decode(private_b64)
     if algorithm == "ed25519":
-        return Ed25519PrivateKey.from_private_bytes(raw)
+        return Ed25519PrivateKey.from_private_bytes(raw[:32])
     if algorithm == "ed448":
-        return Ed448PrivateKey.from_private_bytes(raw)
+        return Ed448PrivateKey.from_private_bytes(raw[:57])
     raise UnsupportedAlgorithm(f"Unknown signature algorithm: {algorithm!r}")
 
 

@@ -48,10 +48,11 @@ def generate_key(alg: str = DEFAULT_ALGORITHM) -> Dict[str, Union[str, any]]:
 def export_private_key_base64(private_key) -> str:
     """
     Serializes a private key object into a Base64-encoded string.
-    Note: This exports the raw seed; ensure the output is handled securely.
+    Exports seed || public_key (64 bytes for Ed25519, 114 for Ed448).
     """
-    raw = private_key.private_bytes_raw()
-    return base64.b64encode(raw).decode("utf-8")
+    seed = private_key.private_bytes_raw()
+    pub = private_key.public_key().public_bytes_raw()
+    return base64.b64encode(seed + pub).decode("utf-8")
 
 
 def export_public_key_base64(public_key) -> str:

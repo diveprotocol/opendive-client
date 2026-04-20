@@ -144,11 +144,13 @@ class VerificationResult:
 @dataclass
 class SigEntry:
     key_id: str
-    sig_label: str          # label from Signature-Input (e.g. "sigABC")
-    sig_algorithm: str      # from alg param
-    signature: str          # base64 from Signature header
+    sig_label: str             # label from Signature-Input (e.g. "sigABC")
+    sig_algorithm: str         # from alg param
+    signature: str             # base64 from Signature header
     content_digest_value: str  # full Content-Digest header value
-    hash_algorithm: str     # DIVE canonical name derived from Content-Digest alg
+    hash_algorithm: str        # DIVE canonical name derived from Content-Digest alg
+    raw_sig_params: str = ""   # exact dict-value string from Signature-Input for RFC 9421 base
+    fqdn_qualifier: str | None = None  # optional @fqdn suffix stripped from keyid
 
 
 def _parse_content_digest(header_value: str) -> tuple[str, str] | None:
@@ -210,9 +212,16 @@ def _parse_rfc9421_headers(
     entries: list[SigEntry] = []
     seen_key_ids: set[str] = set()
 
-    for label, (key_id, sig_alg, _) in sig_input_entries.items():
+    for label, (raw_keyid, sig_alg, raw_params) in sig_input_entries.items():
         if label not in sig_values:
             continue
+
+        # Strip optional @fqdn qualifier from the keyid
+        if "@" in raw_keyid:
+            key_id, fqdn_qualifier = raw_keyid.split("@", 1)
+        else:
+            key_id, fqdn_qualifier = raw_keyid, None
+
         if key_id in seen_key_ids:
             continue  # RFC: ignore duplicate Key IDs after first occurrence
         seen_key_ids.add(key_id)
@@ -225,6 +234,8 @@ def _parse_rfc9421_headers(
                 signature=sig_values[label],
                 content_digest_value=cd_value,
                 hash_algorithm=dive_hash_alg,
+                raw_sig_params=raw_params,
+                fqdn_qualifier=fqdn_qualifier,
             )
         )
 
@@ -374,7 +385,18 @@ class DiveClient:
         """
         log = KeyResolutionEntry(key_id=entry.key_id)
 
-        start_fqdn = resource_fqdn
+        # If a @fqdn qualifier is present, validate it is the resource origin or
+        # a parent, then use it as the walk starting point.
+        if entry.fqdn_qualifier:
+            if not (
+                resource_fqdn == entry.fqdn_qualifier
+                or resource_fqdn.endswith("." + entry.fqdn_qualifier)
+            ):
+                log.found = False
+                return None, log
+            start_fqdn = entry.fqdn_qualifier
+        else:
+            start_fqdn = resource_fqdn
 
         # Walk upward up to (and including) the policy domain
         from .dns import _domain_walk  # local import to avoid circular
@@ -471,12 +493,13 @@ class DiveClient:
         if actual_digest_b64 != expected_digest_b64:
             return False
 
-        # Build RFC 9421 signature base and verify
-        sig_base = build_signature_base(
-            entry.content_digest_value,
-            entry.key_id,
-            sig_algorithm,
-        )
+        # Build RFC 9421 signature base using the raw params string exactly as
+        # it appeared in Signature-Input (RFC 9421 §2.5).
+        sig_base = (
+            f'"content-digest": {entry.content_digest_value}\n'
+            f'"@signature-params": {entry.raw_sig_params}'
+        ).encode("utf-8")
+
 
         from cryptography.exceptions import InvalidSignature
         from cryptography.hazmat.primitives.asymmetric.ed448 import Ed448PublicKey
@@ -494,7 +517,7 @@ class DiveClient:
             raw_sig = base64.b64decode(entry.signature)
             pub.verify(raw_sig, sig_base)
             return True
-        except (InvalidSignature, Exception):
+        except Exception:
             return False
 
     # ── Main verify method ────────────────────────────────────────────────────
