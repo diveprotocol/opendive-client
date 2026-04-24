@@ -13,11 +13,12 @@ If you discover a security vulnerability in OpenDIVE, please report it responsib
 
 ## Supported Versions
 
-Only the latest release (`0.2.0-beta.1+draft.01`) is currently supported. Security updates will be provided for all future stable releases (`>=1.0.0`).
+Only the latest release (`0.2.0+draft.01`) is currently supported. Security updates will be provided for all future stable releases (`>=1.0.0`).
 
 | Version                | Supported          |
 | ---------------------- | ------------------ |
-| 0.2.0-beta.1+draft.01  | :white_check_mark: |
+| 0.2.0+draft.01         | :white_check_mark: |
+| 0.2.0-beta.1+draft.01  | :x:                |
 | 0.2.0-alpha.1+draft.01 | :x:                |
 | 0.1.1+draft.00         | :x:                |
 | 0.1.1-beta.2+draft.00  | :x:                |

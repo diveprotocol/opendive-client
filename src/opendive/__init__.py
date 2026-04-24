@@ -1,4 +1,4 @@
-__version__ = "0.2.0b1"
+__version__ = "0.2.0"
 __author__ = "Matéo Florian CALLEC"
 __url__ = "https://github.com/diveprotocol/opendive-client"
 __license__ = "MIT"
