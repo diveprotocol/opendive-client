@@ -319,7 +319,7 @@ class DiveClient:
         self,
         custom_dns: str | None = None,
         require_dnssec: bool = False,
-        user_agent: str = "opendive-client/0.1",
+        user_agent: str = "OpenDIVE-Client/0.1",
         http_timeout: float = 30.0,
     ) -> None:
         self.custom_dns = custom_dns
