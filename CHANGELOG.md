@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0-beta.1+draft.01] — 2026-04-24
+
+### Changed
+
+* **User-Agent**: Updated the User-Agent string to `OpenDIVE-Client/0.2`.
+
+---
+
 ## [0.2.0-alpha.1+draft.01] — 2026-04-19
 
 ### Changed
