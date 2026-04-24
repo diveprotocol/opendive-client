@@ -9,19 +9,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0-beta.1+draft.01] — 2026-04-24
 
+### Added
+
+- N/A
+
+### Changed
+- Promoted `0.2.0-beta.1+draft.01` to stable release with no functional changes.
+
+### Fixed
+
+- N/A
+
+### Security
+
+- N/A
+
+### Known Issues
+
 - N/A
 
 ---
 
 ## [0.2.0-beta.1+draft.01] — 2026-04-24
 
+### Added
+
+- N/A
+
 ### Changed
 
 * **User-Agent**: Updated the User-Agent string to `OpenDIVE-Client/0.2`.
 
+### Fixed
+
+- N/A
+
+### Security
+
+- N/A
+
+### Known Issues
+
+- N/A
+
 ---
 
 ## [0.2.0-alpha.1+draft.01] — 2026-04-19
+
+### Added
+
+- N/A
 
 ### Changed
 
@@ -37,6 +74,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`dive sign` CLI**: Now outputs `Content-Digest`, `Signature-Input`, and `Signature` headers instead of a single `DIVE-Sig` header.
 - **`sign_file()` API**: Now requires a `key_id` argument; returns `content_digest_header`, `signature_input_header`, and `signature_header` fields.
 - **`sign_hash()` / `verify_hash()` API**: Added optional `key_id` parameter (default `"key1"`); both now operate over the RFC 9421 signature base.
+
+### Fixed
+
+- N/A
+
+### Security
+
+- N/A
+
+### Known Issues
+
+- N/A
 
 ---
 
