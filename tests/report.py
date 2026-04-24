@@ -31,7 +31,10 @@ SAMPLE_REPORT = {
         "status-code": 200,
         "scope": "strict",
     },
-    "headers-received": {"dive-sig": "key1:sha256:MEUCIQD...BASE64SIGNATURE..."},
+    "headers-received": {
+        "signature-input": 'sigkey1=("content-digest");keyid="key1";alg="ed25519"',
+        "content-digest": "sha-256=:MEUCIQD...BASE64DIGEST...:",
+    },
     "key-resolution": [
         {
             "key-id": "key1",

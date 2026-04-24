@@ -22,7 +22,7 @@ This roadmap outlines the future development plans for the DIVE (Domain-based In
 
 ## Current Status
 
-**Version**: 0.1.1
+**Version**: 0.2.0
 **Features Implemented**:
 
 - Core DIVE protocol implementation (DNS records, HTTP headers)
@@ -225,7 +225,6 @@ This roadmap outlines the future development plans for the DIVE (Domain-based In
 
 | Version | Target Date    | Focus Areas                   |
 | ------- | -------------- | ----------------------------- |
-| 0.2.0   | June 2026      | RFC compliance, custom scopes |
 | 0.3.0   | September 2026 | Performance, ecosystem tools  |
 | 0.4.0   | December 2026  | RFC updates, interop testing  |
 | 1.0.0   | 2027           | IETF standardization support  |

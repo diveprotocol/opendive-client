@@ -117,7 +117,7 @@ opendive keygen --alg ed25519 --key-id mykey --domain example.com
 
 ## `opendive sign`
 
-Sign a file and generate a `DIVE-Sig` header entry.
+Sign a file and generate RFC 9421 HTTP signature headers.
 
 ### Usage
 
@@ -130,14 +130,16 @@ opendive sign <file> [OPTIONS]
 | Option              | Description                                                                           | Default   |
 | ------------------- | ------------------------------------------------------------------------------------- | --------- |
 | `--private-key B64` | Base64-encoded private key (from `dive keygen`).                                      | Required  |
-| `--key-id ID`       | Key ID to embed in the `DIVE-Sig` header.                                             | Required  |
+| `--key-id ID`       | Key ID to embed in the `Signature-Input` header.                                      | Required  |
 | `--alg ALG`         | Signature algorithm (`ed25519` or `ed448`).                                           | `ed25519` |
 | `--hash ALG`        | Hash algorithm (`sha256`, `sha384`, `sha512`, `sha3-256`, `sha3-384`, or `sha3-512`). | `sha256`  |
 | `--json`            | Output as JSON.                                                                       | False     |
 
 ### Output
 
-- **DIVE-Sig header entry**: Ready to add to HTTP responses.
+- **Content-Digest**: RFC 9530 body hash header, ready to add to HTTP responses.
+- **Signature-Input**: RFC 9421 signature metadata header.
+- **Signature**: RFC 9421 base64 signature value header.
 - **Hex digest**: For verification and debugging.
 
 ### Example
@@ -214,7 +216,8 @@ All commands support `--json` for machine-readable output. Example for `opendive
   "hash_algorithm": "sha256",
   "hex_digest": "a1b2c3...",
   "signature_valid": true,
-  "dive_sig_header": "key1:sha256:BASE64SIG",
+  "signature_input_header": "sigkey1=(\"content-digest\");keyid=\"key1\";alg=\"ed25519\"",
+  "content_digest_header": "sha-256=:BASE64DIGEST:",
   "key_resolution": [
     {
       "key_id": "key1",

@@ -64,9 +64,9 @@ def _load_private_key(
 ) -> Ed25519PrivateKey | Ed448PrivateKey:
     raw = base64.b64decode(private_b64)
     if algorithm == "ed25519":
-        return Ed25519PrivateKey.from_private_bytes(raw)
+        return Ed25519PrivateKey.from_private_bytes(raw[:32])
     if algorithm == "ed448":
-        return Ed448PrivateKey.from_private_bytes(raw)
+        return Ed448PrivateKey.from_private_bytes(raw[:57])
     raise UnsupportedAlgorithm(f"Unknown signature algorithm: {algorithm!r}")
 
 
@@ -169,25 +169,32 @@ def sign(
 def sign_file(
     data: bytes,
     private_key_b64: str,
+    key_id: str,
     sig_algorithm: SigAlgorithm = DEFAULT_SIG_ALG,
     hash_algorithm: HashAlgorithm = DEFAULT_HASH_ALG,
 ) -> dict:
     """
-    High-level signing function used by the CLI.
-    1. Hashes the data.
-    2. Signs the hex digest (DIVE RFC requirement).
-    3. Returns a dict containing all metadata for the CLI output.
+    High-level signing function used by the CLI (DIVE draft-01).
+    Constructs RFC 9421 Signature-Input / Signature / Content-Digest headers.
+    Returns a dict containing all metadata and header values for the CLI output.
     """
-    result = sign_hash(
-        data,
-        private_key_b64,
-        sig_algorithm=sig_algorithm,
-        hash_algorithm=hash_algorithm,
-    )
+    content_digest_value = build_content_digest(data, hash_algorithm)
+    sig_label = f"sig{key_id}"
+    sig_base = build_signature_base(content_digest_value, key_id, sig_algorithm)
+    signature_b64 = sign(sig_base, private_key_b64, sig_algorithm)
 
-    # Add the hex_digest specifically for the CLI's --json output and display
-    result["hex_digest"] = result["digest"]
-    return result
+    return {
+        "hash_algorithm": hash_algorithm,
+        "sig_algorithm": sig_algorithm,
+        "hex_digest": compute_hex_digest(data, hash_algorithm),
+        "sig_label": sig_label,
+        "content_digest_header": content_digest_value,
+        "signature_input_header": (
+            f'{sig_label}=("content-digest");keyid="{key_id}";alg="{sig_algorithm}"'
+        ),
+        "signature_header": f"{sig_label}=:{signature_b64}:",
+        "signature": signature_b64,
+    }
 
 
 def sign_hash(
@@ -195,15 +202,17 @@ def sign_hash(
     private_key_b64: str,
     sig_algorithm: SigAlgorithm = DEFAULT_SIG_ALG,
     hash_algorithm: HashAlgorithm = DEFAULT_HASH_ALG,
+    key_id: str = "key1",
 ) -> dict:
     """
-    Hash the payload, then sign the hex digest.
+    Hash the payload and sign using the RFC 9421 signature base.
     Returns a dict with the hex digest and the base64 signature.
 
     Typical DIVE usage: sign_hash(file_bytes, private_key)
     """
-    payload = build_signature_input(data, hash_algorithm)
-    signature = sign(payload, private_key_b64, sig_algorithm)
+    content_digest_value = build_content_digest(data, hash_algorithm)
+    sig_base = build_signature_base(content_digest_value, key_id, sig_algorithm)
+    signature = sign(sig_base, private_key_b64, sig_algorithm)
 
     return {
         "hash_algorithm": hash_algorithm,
@@ -250,30 +259,63 @@ def verify_hash(
     public_key_b64: str,
     sig_algorithm: SigAlgorithm = DEFAULT_SIG_ALG,
     hash_algorithm: HashAlgorithm = DEFAULT_HASH_ALG,
+    key_id: str = "key1",
 ) -> bool:
     """
-    Hash the payload then verify the signature over the hex digest.
+    Hash the payload then verify the RFC 9421 signature.
     Mirror of sign_hash().
     """
-    payload = build_signature_input(data, hash_algorithm)
-    return verify(payload, signature_b64, public_key_b64, sig_algorithm)
+    content_digest_value = build_content_digest(data, hash_algorithm)
+    sig_base = build_signature_base(content_digest_value, key_id, sig_algorithm)
+    return verify(sig_base, signature_b64, public_key_b64, sig_algorithm)
 
 
-def build_signature_input(data: bytes, algorithm: str) -> bytes:
+# ── RFC 9421 / RFC 9530 helpers ───────────────────────────────────────────────
+
+# Maps DIVE canonical hash names → RFC 9530 Content-Digest algorithm names
+_RFC9530_ALG: dict[str, str] = {
+    "sha256": "sha-256",
+    "sha384": "sha-384",
+    "sha512": "sha-512",
+    "sha3-256": "sha3-256",
+    "sha3-384": "sha3-384",
+    "sha3-512": "sha3-512",
+}
+
+# Reverse: RFC 9530 names → DIVE canonical names
+_DIVE_ALG_FROM_RFC9530: dict[str, str] = {v: k for k, v in _RFC9530_ALG.items()}
+
+
+def build_content_digest(data: bytes, algorithm: HashAlgorithm) -> str:
     """
-    Strict implementation of DIVE RFC v0.1 §5.5.1.
-    input = hash_algorithm_name || ":" || hash_bytes_raw
-
-    Note: the algorithm name in the prefix uses the DIVE canonical form
-    (e.g. "sha3-256"), not the hashlib internal name ("sha3_256").
+    Compute the RFC 9530 Content-Digest header value.
+    Returns e.g. 'sha-256=:BASE64DIGEST:'
     """
+    if algorithm not in _RFC9530_ALG:
+        raise UnsupportedAlgorithm(f"Unsupported hash algorithm: {algorithm!r}")
     hasher = hashlib.new(_hashlib_name(algorithm))
     hasher.update(data)
-    hash_bytes_raw = hasher.digest()
+    digest_b64 = base64.b64encode(hasher.digest()).decode("ascii")
+    return f"{_RFC9530_ALG[algorithm]}=:{digest_b64}:"
 
-    prefix = f"{algorithm}:".encode("ascii")
 
-    return prefix + hash_bytes_raw
+def build_signature_base(
+    content_digest_value: str,
+    key_id: str,
+    sig_algorithm: str,
+) -> bytes:
+    """
+    Construct the RFC 9421 signature base covering content-digest.
+
+    Format (per RFC 9421 §2.5):
+      "content-digest": <value>\\n"@signature-params": <params>
+    """
+    sig_params = f'("content-digest");keyid="{key_id}";alg="{sig_algorithm}"'
+    base = (
+        f'"content-digest": {content_digest_value}\n'
+        f'"@signature-params": {sig_params}'
+    )
+    return base.encode("utf-8")
 
 
 def compute_hex_digest(data: bytes, algorithm: HashAlgorithm) -> str:

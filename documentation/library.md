@@ -104,7 +104,8 @@ Contains the outcome of a DIVE verification.
 | `hex_digest`       | `Optional[str]`            | Hex digest of the resource.                        |
 | `signature_valid`  | `bool`                     | `True` if at least one signature was valid.        |
 | `key_resolution`   | `List[KeyResolutionEntry]` | List of key resolution attempts.                   |
-| `dive_sig_header`  | `Optional[str]`            | Raw `DIVE-Sig` header value.                       |
+| `signature_input_header` | `Optional[str]`      | Raw `Signature-Input` header value (RFC 9421).     |
+| `content_digest_header`  | `Optional[str]`      | Raw `Content-Digest` header value (RFC 9530).      |
 | `dnssec_validated` | `bool`                     | `True` if DNS records were DNSSEC-validated.       |
 | `policy_domain`    | `Optional[str]`            | Domain of the applied policy.                      |
 | `policy_fqdn`      | `Optional[str]`            | FQDN of the resource.                              |
@@ -160,9 +161,9 @@ keys = get_key_record_walk("sub.example.com", "key1")
 
 ### Functions
 
-#### `sign_hash(data: bytes, private_key_b64: str, sig_algorithm: str, hash_algorithm: str) -> dict`
+#### `sign_hash(data: bytes, private_key_b64: str, sig_algorithm: str, hash_algorithm: str, key_id: str) -> dict`
 
-Hash the data and sign the digest.
+Hash the data and sign using the RFC 9421 signature base.
 
 **Returns**: Dict with `hash_algorithm`, `digest`, `sig_algorithm`, and `signature`.
 
@@ -174,13 +175,14 @@ result = sign_hash(
     b"file content",
     private_key_b64="...",
     sig_algorithm="ed25519",
-    hash_algorithm="sha256"
+    hash_algorithm="sha256",
+    key_id="mykey",
 )
 ```
 
-#### `verify_hash(data: bytes, signature_b64: str, public_key_b64: str, sig_algorithm: str, hash_algorithm: str) -> bool`
+#### `verify_hash(data: bytes, signature_b64: str, public_key_b64: str, sig_algorithm: str, hash_algorithm: str, key_id: str) -> bool`
 
-Verify a signature over hashed data.
+Verify an RFC 9421 signature over hashed data.
 
 **Example**:
 
@@ -191,7 +193,8 @@ valid = verify_hash(
     signature_b64="...",
     public_key_b64="...",
     sig_algorithm="ed25519",
-    hash_algorithm="sha256"
+    hash_algorithm="sha256",
+    key_id="mykey",
 )
 ```
 
@@ -292,7 +295,7 @@ else:
 
 ```python
 from dive.keys import generate_base64_keypair
-from dive.crypto import sign_hash
+from dive.crypto import sign_file
 
 # Generate keys
 keys = generate_base64_keypair("ed25519")
@@ -301,14 +304,17 @@ keys = generate_base64_keypair("ed25519")
 with open("file.tar.gz", "rb") as f:
     data = f.read()
 
-result = sign_hash(
+result = sign_file(
     data,
     private_key_b64=keys["private_key"],
+    key_id="key1",
     sig_algorithm="ed25519",
-    hash_algorithm="sha256"
+    hash_algorithm="sha256",
 )
 
-print(f"DIVE-Sig: key1:sha256:{result['signature']}")
+print(f"Content-Digest: {result['content_digest_header']}")
+print(f"Signature-Input: {result['signature_input_header']}")
+print(f"Signature: {result['signature_header']}")
 ```
 
 ### 3. DNS Inspection
