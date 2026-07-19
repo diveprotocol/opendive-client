@@ -1,14 +1,20 @@
-### 🎉 IETF 126: Try it out!
+### 🎉 IETF 126 attendees: Try it out!
 
 A sandbox environment is available to see DIVE in action!
 
-#### Valid file (DIVE verification succeeds)
+#### 1. Download OpenDIVE Client
+
+```bash
+pip install opendive-client
+```
+
+#### 2. Download a valid file (DIVE verification succeeds)
 
 ```bash
 opendive download https://sandbox.diveprotocol.org/downloads/valid.txt
 ```
 
-#### Invalid file (DIVE verification fails)
+#### 3. Download an invalid file (DIVE verification fails)
 
 ```bash
 opendive download https://sandbox.diveprotocol.org/downloads/invalid.txt
