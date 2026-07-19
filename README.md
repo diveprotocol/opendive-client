@@ -1,3 +1,21 @@
+### 🎉 IETF 126: Try it out!
+
+A sandbox environment is available to see DIVE in action!
+
+#### Valid file (DIVE verification succeeds)
+
+```bash
+opendive download https://sandbox.diveprotocol.org/downloads/valid.txt
+```
+
+#### Invalid file (DIVE verification fails)
+
+```bash
+opendive download https://sandbox.diveprotocol.org/downloads/invalid.txt
+```
+
+---
+
 # OpenDIVE: Python Client for Domain-based Integrity Verification Enforcement (DIVE)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
